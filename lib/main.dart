@@ -12,34 +12,50 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'First App',
-      // theme: ThemeData(
-      //   // primaryColor: Colors.lightBlue[800],
-      //   colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
-      //   useMaterial3: true,
-      // ),
       theme: ThemeData(
         primarySwatch: Colors.blue,
-        appBarTheme: AppBarTheme(
+        appBarTheme: const AppBarTheme(
           iconTheme: IconThemeData(color: Colors.black),
           color: Colors.deepPurpleAccent,
         ),
       ),
-      home: MyHomePage(),
+      home: const MyHomePage(),
     );
   }
 }
 
-class MyHomePage extends StatelessWidget {
+class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key});
+
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  String text = "";
+
+  void changeText(String newText) {
+    setState(() {
+      text = newText;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    // return Scaffold(appBar: AppBar(title: Text('Hello World!')));
     return Scaffold(
-        appBar: AppBar(title: Text('Example title')), body: TextInputWidget());
+      appBar: AppBar(
+        title: const Text('Arifs Blogs'),
+      ),
+      body: Column(
+        children: <Widget>[TextInputWidget(changeText), Text(text)],
+      ),
+    );
   }
 }
 
 class TextInputWidget extends StatefulWidget {
-  const TextInputWidget({super.key});
+  final Function(String) callback;
+  const TextInputWidget(this.callback);
 
   @override
   State<TextInputWidget> createState() => _TextInputWidgetState();
@@ -47,7 +63,6 @@ class TextInputWidget extends StatefulWidget {
 
 class _TextInputWidgetState extends State<TextInputWidget> {
   final controller = TextEditingController();
-  String text = "";
 
   @override
   void dispose() {
@@ -55,28 +70,25 @@ class _TextInputWidgetState extends State<TextInputWidget> {
     controller.dispose();
   }
 
-  void changeText(newText) {
-    if (newText == "clr") {
-      controller.clear();
-      newText = "";
-    }
-    setState(() {
-      this.text = newText;
-    });
+  void click() {
+    widget.callback(controller.text);
+    controller.clear();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        TextField(
-          controller: this.controller,
-          decoration: InputDecoration(
-              prefixIcon: Icon(Icons.message), labelText: "Type a message"),
-          onChanged: (text) => this.changeText(text),
+    return TextField(
+      controller: controller,
+      decoration: InputDecoration(
+        prefixIcon: const Icon(Icons.message),
+        labelText: "Type a message",
+        suffixIcon: IconButton(
+          icon: const Icon(Icons.send),
+          splashColor: const Color.fromARGB(255, 187, 22, 47),
+          tooltip: "Post Message",
+          onPressed: () => {click()},
         ),
-        Text(this.text)
-      ],
+      ),
     );
   }
 }
